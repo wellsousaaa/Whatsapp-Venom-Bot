@@ -12,9 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.4",
+    "docker": "^1.0.0",
     "dotenv": "^10.0.0",
     "ffmpeg-static": "^4.4.0",
     "fluent-ffmpeg": "^2.1.2",
+    "global": "^4.4.0",
     "jimp": "^0.16.1",
     "venom-bot": "3.0.21",
     "youtube-mp3-downloader": "^0.7.7",
