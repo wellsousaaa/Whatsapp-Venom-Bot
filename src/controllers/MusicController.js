@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const pathToFfmpeg = require('ffmpeg-static');
+const pathToFfmpeg = require("ffmpeg-static");
 
 const YoutubeMp3Downloader = require("youtube-mp3-downloader");
 const YoutubeMusicApi = require("youtube-music-api");
@@ -10,7 +10,7 @@ const api = new YoutubeMusicApi();
 //Configure YoutubeMp3Downloader with your settings
 const YD = new YoutubeMp3Downloader({
   ffmpegPath: pathToFfmpeg, // FFmpeg binary location
-  outputPath: path.resolve(__dirname, "..", "audios"), // Output file location (default: the home directory)
+  // outputPath: "../audios",  Output file location (default: the home directory)
   youtubeVideoQuality: "highestaudio", // Desired video quality (default: highestaudio)
   queueParallelism: 2, // Download parallelism (default: 1)
   progressTimeout: 2000, // Interval in ms for the progress reports (default: 1000)
@@ -28,8 +28,8 @@ module.exports = {
 
     YD.on("finished", async function (err, data) {
       const { file, title } = data;
+      console.log(file);
       await client.sendFile(message.from, file, title + ".mp3", title);
-      fs.unlinkSync(file);
     });
 
     YD.on("error", function (error) {
