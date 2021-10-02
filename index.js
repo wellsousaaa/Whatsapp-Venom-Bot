@@ -1,4 +1,10 @@
 const venom = require("venom-bot");
+const http = require("http");
+
+const requestListener = function (req, res) {
+  res.writeHead(200);
+  res.end("Made by Wendell de Sousa!");
+};
 
 const MusicController = require("./src/controllers/MusicController");
 const StickerController = require("./src/controllers/StickerController");
@@ -41,3 +47,8 @@ async function handleMessage(client, message) {
     await client.clearChatMessages(message.from);
   }
 }
+
+const server = http.createServer(requestListener);
+server.listen(3000, () => {
+  console.log(`Server is running`);
+});
