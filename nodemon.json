@@ -1,0 +1,4 @@
+{
+    "ignore": ["*.test.js", "tokens/*"]
+  
+  }
