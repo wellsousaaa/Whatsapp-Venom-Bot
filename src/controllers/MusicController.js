@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const pathToFfmpeg = require('ffmpeg-static');
 
 const YoutubeMp3Downloader = require("youtube-mp3-downloader");
 const YoutubeMusicApi = require("youtube-music-api");
@@ -8,7 +9,7 @@ const api = new YoutubeMusicApi();
 
 //Configure YoutubeMp3Downloader with your settings
 const YD = new YoutubeMp3Downloader({
-  ffmpegPath: path.resolve(__dirname, "..", "bin", "ffmpeg"), // FFmpeg binary location
+  ffmpegPath: pathToFfmpeg, // FFmpeg binary location
   outputPath: path.resolve(__dirname, "..", "audios"), // Output file location (default: the home directory)
   youtubeVideoQuality: "highestaudio", // Desired video quality (default: highestaudio)
   queueParallelism: 2, // Download parallelism (default: 1)
