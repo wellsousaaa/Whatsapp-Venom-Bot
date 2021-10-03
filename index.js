@@ -1,5 +1,8 @@
 const venom = require("venom-bot");
 const http = require("http");
+const fetch = require("node-fetch");
+
+require("dotenv").config();
 
 const requestListener = function (req, res) {
   res.writeHead(200);
@@ -9,47 +12,78 @@ const requestListener = function (req, res) {
 const MusicController = require("./src/controllers/MusicController");
 const StickerController = require("./src/controllers/StickerController");
 
-venom
-  .create("sessionName", (base64Qrimg, asciiQR, attempts, urlCode) => {
-    console.log("Number of attempts to read the qrcode: ", attempts);
-    console.log("Terminal qrcode: ", asciiQR);
-    console.log("base64 image string qrcode: ", base64Qrimg);
-    console.log("urlCode (data-ref): ", urlCode);
-  })
-  .then((client) => start(client))
-  .catch((erro) => {
-    console.log(erro);
-  });
+(async () => {
+  const token = await fetch(process.env.PANTRY_URL)
+    .then((data) => data.json())
+    .catch((err) => console.log(err));
 
-function start(client) {
-  client.onMessage((message) => handleMessage(client, message));
-}
+  init(token ? token.token : null);
+})();
 
-async function handleMessage(client, message) {
-  const commandIs = (string, caption = false) =>
-    caption
-      ? message.caption?.indexOf(string) >= 0
-      : message.body?.indexOf(string) >= 0;
+const init = (token) => {
+  venom
+    .create(
+      "sessionName",
+      () => {},
+      () => {},
+      {},
+      token
+        ? {
+            WABrowserId: token.WABrowserId,
+            WASecretBundle: token.WASecretBundle,
+            WAToken1: token.WAToken1,
+            WAToken2: token.WAToken2,
+          }
+        : {}
+    )
+    .then((client) => start(client))
+    .catch((erro) => {
+      console.log(erro);
+    });
 
-  // console.log(message);
+  async function start(client) {
+    const token = await client.getSessionTokenBrowser();
 
-  /// Get Music from URL
-  if (commandIs("--music-url")) MusicController.fromURL(client, message);
-  /// Get Music from Search
-  else if (commandIs("--music-search"))
-    MusicController.fromSearch(client, message);
-  /// Image and GIF to Sticker
-  else if (commandIs("--fig-url"))
-    StickerController.URLToSticker(client, message);
-  else if (commandIs("--fig", true))
-    StickerController.imageToSticker(client, message);
-  else {
-    await client.clearChatMessages(message.from);
+    const data = await fetch(process.env.PANTRY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: token }),
+    })
+      .then((res) => res.ok)
+      .catch((err) => console.log(err));
+
+    console.log(data);
+
+    client.onMessage((message) => handleMessage(client, message));
   }
-}
+
+  async function handleMessage(client, message) {
+    const commandIs = (string, caption = false) =>
+      caption
+        ? message.caption?.indexOf(string) >= 0
+        : message.body?.indexOf(string) >= 0;
+
+    // console.log(message);
+
+    /// Get Music from URL
+    if (commandIs("--music-url")) MusicController.fromURL(client, message);
+    /// Get Music from Search
+    else if (commandIs("--music-search"))
+      MusicController.fromSearch(client, message);
+    /// Image and GIF to Sticker
+    else if (commandIs("--fig-url"))
+      StickerController.URLToSticker(client, message);
+    else if (commandIs("--fig", true))
+      StickerController.imageToSticker(client, message);
+    else {
+      await client.clearChatMessages(message.from);
+    }
+  }
+};
 
 const port = process.env.PORT || 5000;
 const server = http.createServer(requestListener);
+
 server.listen(port, () => {
-  console.log(`Server is running`);
+  console.log("Server running");
 });
