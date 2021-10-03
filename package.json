@@ -16,6 +16,7 @@
     "ffmpeg-static": "^4.4.0",
     "fluent-ffmpeg": "^2.1.2",
     "jimp": "^0.16.1",
+    "node-fetch": "2.0.0",
     "venom-bot": "3.0.21",
     "youtube-mp3-downloader": "^0.7.7",
     "youtube-music-api": "^1.0.6"
