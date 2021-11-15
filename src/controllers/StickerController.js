@@ -17,12 +17,15 @@ module.exports = {
 
     console.log(url);
 
-    url.indexOf(".gif") >= 0
-      ? await client
-          .sendImageAsStickerGif(message.from, url)
-          .catch((err) => console.log(err))
-      : await client
-          .sendImageAsSticker(message.from, url)
-          .catch((err) => console.log(err));
+    // url.indexOf(".gif") >= 0
+    // ?
+    // await client
+    //     .sendImageAsStickerGif(message.from, url)
+    //     .catch((err) => console.log(err))
+    // :
+    await client
+      .sendImageAsSticker(message.from, url)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   },
 };

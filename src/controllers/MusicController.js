@@ -60,7 +60,7 @@ module.exports = {
           text +=
             "\n Copie alguma URL e use o comando \n```--music-url [URL]``` \npara baixar a música!";
 
-          client.sendText(message.from, text);
+          client.sendText(message.from, text).catch((err) => console.log(err));
         });
       });
   },

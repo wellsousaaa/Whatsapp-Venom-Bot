@@ -1,0 +1,11 @@
+2021/11/14-21:51:42.039 2d58 Reusing MANIFEST C:\Users\wende\Desktop\zap-bot\tokens\sessionName\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/11/14-21:51:42.040 2d58 Recovering log #35
+2021/11/14-21:51:42.201 2d58 Reusing old log C:\Users\wende\Desktop\zap-bot\tokens\sessionName\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000035.log 
+2021/11/14-21:51:43.875 d68 Level-0 table #41: started
+2021/11/14-21:51:44.295 d68 Level-0 table #41: 1248108 bytes OK
+2021/11/14-21:51:44.498 d68 Delete type=0 #35
+2021/11/14-21:51:56.001 3514 Compacting 1@1 + 2@2 files
+2021/11/14-21:51:57.123 3514 Generated table #42@1: 25588 keys, 2218551 bytes
+2021/11/14-21:51:57.885 3514 Generated table #43@1: 49456 keys, 1780073 bytes
+2021/11/14-21:51:57.886 3514 Compacted 1@1 + 2@2 files => 3998624 bytes
+2021/11/14-21:51:58.006 3514 compacted to: files[ 0 0 2 0 0 0 0 ]

@@ -1,41 +1,49 @@
 const venom = require("venom-bot");
 const http = require("http");
 const fetch = require("node-fetch");
+const chromium = require("chromium");
 
 require("dotenv").config();
 
+var teste = "não deu certo";
+
+var whitelist = [];
+
 const requestListener = function (req, res) {
   res.writeHead(200);
-  res.end("Made by Wendell de Sousa!");
+  res.end(teste || "Made by Wendell de Sousa!");
 };
 
 const MusicController = require("./src/controllers/MusicController");
 const StickerController = require("./src/controllers/StickerController");
 
-(async () => {
-  const token = await fetch(process.env.PANTRY_URL)
-    .then((data) => data.json())
-    .catch((err) => console.log(err));
+const chromiumArgs = [
+  "--disable-web-security",
+  "--no-sandbox",
+  "--disable-web-security",
+  "--aggressive-cache-discard",
+  "--disable-cache",
+  "--disable-application-cache",
+  "--disable-offline-load-stale-cache",
+  "--disk-cache-size=0",
+  "--disable-background-networking",
+  "--disable-default-apps",
+  "--disable-extensions",
+  "--disable-sync",
+  "--disable-translate",
+  "--hide-scrollbars",
+  "--metrics-recording-only",
+  "--mute-audio",
+  "--no-first-run",
+  "--safebrowsing-disable-auto-update",
+  "--ignore-certificate-errors",
+  "--ignore-ssl-errors",
+  "--ignore-certificate-errors-spki-list",
+];
 
-  init(token ? token.token : null);
-})();
-
-const init = (token) => {
+const init = async () => {
   venom
-    .create(
-      "sessionName",
-      () => {},
-      () => {},
-      {},
-      token
-        ? {
-            WABrowserId: token.WABrowserId,
-            WASecretBundle: token.WASecretBundle,
-            WAToken1: token.WAToken1,
-            WAToken2: token.WAToken2,
-          }
-        : {}
-    )
+    .create({ session: "sessionName", multidevice: true })
     .then((client) => start(client))
     .catch((erro) => {
       console.log(erro);
@@ -44,7 +52,7 @@ const init = (token) => {
   async function start(client) {
     const token = await client.getSessionTokenBrowser();
 
-    const data = await fetch(process.env.PANTRY_URL, {
+    const data = await fetch(process.env.PANTRY_URL + "/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: token }),
@@ -58,6 +66,32 @@ const init = (token) => {
   }
 
   async function handleMessage(client, message) {
+    // console.log(message);
+
+    if (message.body.indexOf("ping") >= 0) {
+      client.sendText(message.from, "pong");
+    }
+
+    if (!message.isGroupMsg) {
+      console.log("não é mensagem de grupo");
+      if (!whitelist.includes(message.chatId)) {
+        console.log("não tá na variavel");
+        try {
+          const { list } = await fetch(process.env.PANTRY_URL + "/whitelist")
+            .then((res) => res.json())
+            .catch(() => ({}));
+
+          if (!list || !list.includes(message.chatId)) return;
+          else {
+            console.log("está na whitelist");
+            whitelist = list;
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+
     const commandIs = (string, caption = false) =>
       caption
         ? message.caption?.indexOf(string) >= 0
@@ -87,3 +121,12 @@ const server = http.createServer(requestListener);
 server.listen(port, () => {
   console.log("Server running");
 });
+
+(async () => {
+  // const token = await fetch(process.env.PANTRY_URL + "/token")
+  //   .then((data) => data.json())
+  //   .catch((err) => console.log(err));
+
+  // init(token ? token.token : null);
+  init();
+})();
