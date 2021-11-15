@@ -1,7 +1,6 @@
 const venom = require("venom-bot");
 const http = require("http");
 const fetch = require("node-fetch");
-const chromium = require("chromium");
 
 require("dotenv").config();
 
