@@ -14,6 +14,7 @@ const requestListener = function (req, res) {
 };
 
 const MusicController = require("./src/controllers/MusicController");
+const VideoController = require("./src/controllers/VideoController");
 const StickerController = require("./src/controllers/StickerController");
 
 const chromiumArgs = [
@@ -42,24 +43,30 @@ const chromiumArgs = [
 
 const init = async () => {
   venom
-    .create({ session: "sessionName", multidevice: true })
+    .create(
+      { session: "sessionName", multidevice: true },
+      {
+        headless: true,
+        args: chromiumArgs,
+      }
+    )
     .then((client) => start(client))
     .catch((erro) => {
       console.log(erro);
     });
 
   async function start(client) {
-    const token = await client.getSessionTokenBrowser();
+    // const token = await client.getSessionTokenBrowser();
 
-    const data = await fetch(process.env.PANTRY_URL + "/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: token }),
-    })
-      .then((res) => res.ok)
-      .catch((err) => console.log(err));
+    // const data = await fetch(process.env.PANTRY_URL + "/token", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ token: token }),
+    // })
+    //   .then((res) => res.ok)
+    //   .catch((err) => console.log(err));
 
-    console.log(data);
+    // console.log(data);
 
     client.onMessage((message) => handleMessage(client, message));
   }
@@ -67,29 +74,31 @@ const init = async () => {
   async function handleMessage(client, message) {
     // console.log(message);
 
+    if (!message.body) return client.sendText(message.from, "Ocorreu um erro");
+
     if (message.body.indexOf("ping") >= 0) {
       client.sendText(message.from, "pong");
     }
 
-    if (!message.isGroupMsg) {
-      console.log("não é mensagem de grupo");
-      if (!whitelist.includes(message.chatId)) {
-        console.log("não tá na variavel");
-        try {
-          const { list } = await fetch(process.env.PANTRY_URL + "/whitelist")
-            .then((res) => res.json())
-            .catch(() => ({}));
+    // if (!message.isGroupMsg) {
+    //   console.log("não é mensagem de grupo");
+    //   if (!whitelist.includes(message.chatId)) {
+    //     console.log("não tá na variavel");
+    //     try {
+    //       const { list } = await fetch(process.env.PANTRY_URL + "/whitelist")
+    //         .then((res) => res.json())
+    //         .catch(() => ({}));
 
-          if (!list || !list.includes(message.chatId)) return;
-          else {
-            console.log("está na whitelist");
-            whitelist = list;
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    }
+    //       if (!list || !list.includes(message.chatId)) return;
+    //       else {
+    //         console.log("está na whitelist");
+    //         whitelist = list;
+    //       }
+    //     } catch (err) {
+    //       console.log(err);
+    //     }
+    //   }
+    // }
 
     const commandIs = (string, caption = false) =>
       caption
@@ -108,6 +117,8 @@ const init = async () => {
       StickerController.URLToSticker(client, message);
     else if (commandIs("--fig", true))
       StickerController.imageToSticker(client, message);
+    else if (commandIs("--ig-url"))
+      VideoController.downloadVideo(client, message);
     else {
       await client.clearChatMessages(message.from);
     }
